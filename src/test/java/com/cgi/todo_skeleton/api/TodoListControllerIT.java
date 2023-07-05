@@ -11,13 +11,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
 import java.time.LocalDateTime;
 
+import static groovy.json.JsonOutput.toJson;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -49,7 +57,7 @@ public class TodoListControllerIT {
 
 
     @Test
-    public void testgetAllTodoList() throws Exception {
+    public void testGetAllTodoList() throws Exception {
 
         // Set up any necessary mock behavior for your service
         // Create test data
@@ -74,20 +82,21 @@ public class TodoListControllerIT {
     }
 
     @Test
-    public void testaddTodoList() throws Exception {
+    public void testAddTodoList() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        ObjectWriter ow = objectMapper.writer().withDefaultPrettyPrinter();
-        TodoList todoList = new TodoList(5, "List One of Many", "Another List", LocalDateTime.now());
+
+        TodoList todoList1 = new TodoList(5, "List One of Many", "Another List", LocalDateTime.now());
+
         // Perform a request to your controller endpoint and validate the response
         mockMvc.perform(
                 post("/todoList/")
-                .content(ow.writeValueAsString(todoList))
+                .content(objectMapper.writeValueAsString(todoList1))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
                 .andExpect(status().isOk())
-               // .andExpect(jsonPath("title", is("List One of Many")))
+                .andExpect(jsonPath("$.id", is(1)))
+                .andDo(print());
         ;
     }
 

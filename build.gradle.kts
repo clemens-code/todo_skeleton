@@ -14,9 +14,9 @@ repositories {
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter")
-	implementation("org.mockito:mockito-core:5.2.0")
+	testImplementation("org.mockito:mockito-core:5.2.0")
 	implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
-	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2")
+	/* implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2") */
 	testImplementation("org.springframework.boot:spring-boot-starter-test") {
 		exclude("org.junit.vintage:junit-vintage-engine")
 	}
