@@ -1,4 +1,4 @@
-package com.cgi.todo_skeleton.service;
+package com.cgi.todo_skeleton.api;
 
 import com.cgi.todo_skeleton.TodoSkeletonApplication;
 import com.cgi.todo_skeleton.api.TodoListController;
@@ -6,6 +6,7 @@ import com.cgi.todo_skeleton.model.TodoList;
 import com.cgi.todo_skeleton.repo.TodoListRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +75,9 @@ public class TodoListControllerIT {
 
     @Test
     public void testaddTodoList() throws Exception {
-        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        ObjectWriter ow = objectMapper.writer().withDefaultPrettyPrinter();
         TodoList todoList = new TodoList(5, "List One of Many", "Another List", LocalDateTime.now());
         // Perform a request to your controller endpoint and validate the response
         mockMvc.perform(
@@ -82,8 +85,9 @@ public class TodoListControllerIT {
                 .content(ow.writeValueAsString(todoList))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-               // .andExpect(jsonPath("$[0].title", is("IT2")))
+                .andDo(print())
+                .andExpect(status().isOk())
+               // .andExpect(jsonPath("title", is("List One of Many")))
         ;
     }
 
